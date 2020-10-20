@@ -99,7 +99,7 @@ int edo = 0;
 int edoAnt = 0;
 int trans = 0;
 float res = 0.0;
-int auxf = 10;
+float auxf = 10;
 
 int miPrintf_flag=0;
 int miStringCont=0;
@@ -117,7 +117,7 @@ int mtzTrans[EDO_COUNT][TRANS_COUNT] = {
 		{ 5  , 5  , 5  , 5  , 99 , 99 , 6  , 7  , 5  },
 		{ 6  , 6  , 6  , 6  , 99 , 99 , 6  , 6  , 6  },
 		{ 7  , 7  , 7  , 7  , 99 , 99 , 8  , 7  , 7  },
-		{ 8  , 8  , 8  , 8  , 99 , 99 , 9  , 8  , 10 },
+		{ 8  , 8  , 8  , 8  , 99 , 99 , 9  , 13 , 10 },
 		{ 9  , 9  , 9  , 9  , 99 , 99 , 9  , 9  , 9  },
 		{ 10 , 10 , 10 , 10 , 99 , 99 , 11 , 10 , 10 },
 		{ 11 , 11 , 13 , 11 , 99 , 99 , 12 , 11 , 11 },
@@ -169,7 +169,7 @@ int ejecutaEdo(int edo) {
     static int digitosCont=0;
     static int digitosEntera = 0;
     static int digitosDecimal = 0;
-    static float auxRes=0;
+//    static float auxRes=0;
     static int auxEnt=0;
     static float decimal=0;
     static int entera=0;
@@ -196,12 +196,12 @@ int ejecutaEdo(int edo) {
 		break;
 	case 5:
 		miPrintf(&chr,1);
-		acum2 += (chr - '0') / auxf;
+		acum2 += (float)(chr - '0') / auxf;
 		auxf *= 10;
 		break;
 	case 6:
 		miPrintf(&chr,1);
-		acum2 += (chr - '0') / auxf;
+		acum2 += (float)(chr - '0') / auxf;
 		auxf *= 10;
 		return(5);
 	case 7:
@@ -240,12 +240,12 @@ int ejecutaEdo(int edo) {
 		break;
 	case 11:
 		miPrintf(&chr,1);
-		acum4 += (chr - '0') / auxf;
+		acum4 += (float)(chr - '0') / auxf;
 		auxf *= 10;
 		break;
 	case 12:
 		miPrintf(&chr,1);
-		acum4 += (chr - '0') / auxf;
+		acum4 += (float)(chr - '0') / auxf;
 		auxf *= 10;
 		return(11);
 	case 13:
@@ -282,30 +282,34 @@ int ejecutaEdo(int edo) {
         }
         
         entera  = res;
-        decimal = res - entera;
-      
-        auxEnt=entera;
+        decimal = res;
+        decimal -= entera;
+        
         digitosCont=0;
+        digitosEntera=0;
+        digitosDecimal=0;
+        
+        auxEnt=entera;
         do {
             auxEnt/=10;
             digitosEntera++;
         } while(auxEnt);
-        auxRes=decimal;
-        do {
-            auxRes*=10;
-            digitosDecimal++;
-        } while(fmod(auxRes,10)!=0.0);
-        digitosCont += digitosEntera+digitosDecimal+1;
         
-        i=digitosDecimal+digitosEntera+1;
+        digitosDecimal=5;
+        digitosCont = digitosEntera+digitosDecimal+1;
+        
+        i=digitosEntera+2;
         do {
             decimal*=10;
-            auxString[negativoFlag+i]='0'+(fmod(decimal,10));
-        } while(--i>=digitosEntera+1);
+            int temp = (int)decimal % 10;
+            //if(i==digitosEntera+1+digitosDecimal && temp >= 6)
+                //temp++;
+            auxString[negativoFlag+i]= '0'+ temp;
+        } while(++i<=digitosEntera+1+digitosDecimal);
         auxString[negativoFlag+digitosEntera+1]='.';
         i=digitosEntera;
         do {
-            auxString[negativoFlag+i]='0'+fmod(entera,10);
+            auxString[negativoFlag+i]='0'+ entera%10;
             entera/=10;
             } while(--i>=0);
         auxString[0]='=';
